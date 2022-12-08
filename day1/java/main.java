@@ -1,10 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 class Day1{
     public static void main(String[] args){
@@ -17,6 +15,7 @@ class Day1{
         Day1.streams(args[0]);
     }
 
+    // a simple looping solution
     private static void loop(String filePath){
         List<String> inputLines = null;
 
@@ -44,6 +43,7 @@ class Day1{
         System.out.println("loop - highest run: " + highestRun);
     }
 
+    // a somewhat silly streams solution
     private static void streams(String filePath){
         String fileContent = null;
 
