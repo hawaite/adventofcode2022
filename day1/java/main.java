@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 class Day1{
@@ -12,7 +13,8 @@ class Day1{
         }
 
         Day1.loop(args[0]);
-        Day1.streams(args[0]);
+        Day1.streams(args[0], false);
+        Day1.streams(args[0], true);
     }
 
     // a simple looping solution
@@ -40,11 +42,11 @@ class Day1{
             }
         }
 
-        System.out.println("loop - highest run: " + highestRun);
+        System.out.printf("loop - highest run: %d\n", highestRun);
     }
 
     // a somewhat silly streams solution
-    private static void streams(String filePath){
+    private static void streams(String filePath, Boolean sumTopThree){
         String fileContent = null;
 
         try {
@@ -60,11 +62,12 @@ class Day1{
             .map(inputPart -> 
                 Arrays.stream(inputPart.split("\n"))
                     .map(Integer::parseInt)
-                    .reduce(0, (acc, newInt) ->  acc + newInt )
+                    .reduce(0, Integer::sum )
             )
-            .max(Integer::compare)
-            .get();
+            .sorted(Comparator.reverseOrder())
+            .limit(sumTopThree ? 3 : 1)
+            .reduce(0, Integer::sum );
 
-        System.out.println("streams - max result : " + maxResult);
+        System.out.printf("streams - max result of top %d: %d\n", sumTopThree ? 3 : 1, maxResult);
     }
 }
