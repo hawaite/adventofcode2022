@@ -40,9 +40,17 @@ class State {
         });
     }
 
-    execCommand = (command: Command) => {
-        for (let ix = 0; ix < command.count; ix++) {
-            this.moveBetweenColumns(command.source, command.destination);
+    execCommand = (command: Command, individually: boolean) => {
+        if (individually) {
+            for (let ix = 0; ix < command.count; ix++) {
+                this.moveBetweenColumns(command.source, command.destination, 1);
+            }
+        } else {
+            this.moveBetweenColumns(
+                command.source,
+                command.destination,
+                command.count
+            );
         }
     };
 
@@ -54,19 +62,31 @@ class State {
         return result;
     };
 
-    private moveBetweenColumns = (source: number, destination: number) => {
-        const toTransfer = this.columnStateMap.get(source)?.pop();
+    private moveBetweenColumns = (
+        source: number,
+        destination: number,
+        count: number
+    ) => {
+        const toTransfer = this.columnStateMap.get(source)?.slice(count * -1);
+
         if (toTransfer !== undefined) {
-            this.columnStateMap.get(destination)?.push(toTransfer);
+            this.columnStateMap.get(destination)?.push(...toTransfer);
+            const remainingSourceSlice = this.columnStateMap
+                .get(source)
+                ?.slice(0, count * -1);
+
+            if (remainingSourceSlice !== undefined) {
+                this.columnStateMap.set(source, remainingSourceSlice);
+            }
         }
     };
 
     private pushToColumn = (column: number, item: string) => {
-        if (item.trim() !== "") {
-            if (this.columnStateMap.get(column) === undefined) {
-                this.columnStateMap.set(column, []);
-            }
+        if (this.columnStateMap.get(column) === undefined) {
+            this.columnStateMap.set(column, []);
+        }
 
+        if (item.trim() !== "") {
             this.columnStateMap.get(column)?.push(item);
         }
     };
@@ -95,7 +115,10 @@ const main = () => {
     );
 
     // run all the commands against the state object
-    parsedCommandList.forEach(state.execCommand);
+    // part 1
+    //parsedCommandList.forEach(command => state.execCommand(command, true));
+    // part 2
+    parsedCommandList.forEach((command) => state.execCommand(command, false));
 
     console.log("top of each stack => " + state.getTopOfEachStack());
 };
