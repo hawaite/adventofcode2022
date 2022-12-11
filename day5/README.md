@@ -1,5 +1,3 @@
-# Day 4
+# Day 5
 
-`https://adventofcode.com/2022/day/4`
-
-Focus: needless use of Python's range function when logical operators would have worked fine.
+`https://adventofcode.com/2022/day/5`
