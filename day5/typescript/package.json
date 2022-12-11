@@ -8,7 +8,8 @@
     "build": "tsc main.ts --outDir ./bin",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf bin",
-    "lint": "pnpx eslint ."
+    "lint": "pnpx eslint .",
+    "lint:fix": "pnpx eslint . --fix"
   },
   "author": "",
   "license": "ISC",

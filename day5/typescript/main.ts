@@ -4,7 +4,7 @@ import * as lodash from "lodash";
 const stateColumnWidth = 4;
 
 class Command {
-    private commandRegex: RegExp = new RegExp(
+    private commandRegex = new RegExp(
         /move (?<count>\d+) from (?<source>\d+) to (?<destination>\d+)/
     );
 
@@ -13,7 +13,7 @@ class Command {
     destination: number;
 
     constructor(textCommand: string) {
-        var results = textCommand.match(this.commandRegex);
+        const results = textCommand.match(this.commandRegex);
         if (results !== null && results.groups !== undefined) {
             this.count = parseInt(results.groups["count"]);
             this.source = parseInt(results.groups["source"]);
@@ -31,7 +31,7 @@ class State {
         this.columnStateMap = new Map();
 
         initialStateRows.reverse().forEach((value) => {
-            let parsedRow = lodash
+            const parsedRow = lodash
                 .chunk(value, stateColumnWidth)
                 .map((item) => item[1]);
             parsedRow.forEach((item, ix) => {
@@ -47,7 +47,7 @@ class State {
     };
 
     getTopOfEachStack = () => {
-        let result: string = "";
+        let result = "";
         this.columnStateMap.forEach((col) => {
             result = result + col.at(-1);
         });
@@ -55,7 +55,7 @@ class State {
     };
 
     private moveBetweenColumns = (source: number, destination: number) => {
-        let toTransfer = this.columnStateMap.get(source)?.pop();
+        const toTransfer = this.columnStateMap.get(source)?.pop();
         if (toTransfer !== undefined) {
             this.columnStateMap.get(destination)?.push(toTransfer);
         }
@@ -80,17 +80,17 @@ const main = () => {
     lineList = lodash.dropRightWhile(lineList, (line) => line.trim() === "");
 
     // starting state is everything up to the first blank line, minus the column header row
-    let startingState = lodash
+    const startingState = lodash
         .takeWhile(lineList, (line) => line.trim() !== "")
         .slice(0, -1);
-    let commandList = lodash.dropWhile(
+    const commandList = lodash.dropWhile(
         lineList,
         (line) => !line.startsWith("move")
     );
 
     // init state
-    let state: State = new State(startingState);
-    let parsedCommandList: Command[] = commandList.map(
+    const state: State = new State(startingState);
+    const parsedCommandList: Command[] = commandList.map(
         (cmdText) => new Command(cmdText)
     );
 
