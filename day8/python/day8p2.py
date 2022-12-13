@@ -1,32 +1,36 @@
 class Tree:
     def __init__(self, height):
         self.height = height
-        self.upVisibility = False
-        self.downVisibility = False
-        self.leftVisibility = False
-        self.rightVisibility = False
+        self.upVisibility = 0
+        self.downVisibility = 0
+        self.leftVisibility = 0
+        self.rightVisibility = 0
 
-    def isVisible(self):
-        return (self.upVisibility or self.downVisibility or self.leftVisibility or self.rightVisibility)
+    def getScore(self):
+        return self.upVisibility * self. rightVisibility * self.downVisibility * self.leftVisibility
+
+    def __str__(self):
+        return f"({self.height}): ^{self.upVisibility} <{self.leftVisibility} V{self.downVisibility} >{self.rightVisibility}"
 
 def checkRowVisibility(tree, idx, treeRow):
 
     leftElements = treeRow[0:idx]
     rightElements = treeRow[idx+1:]
     
-    leftVisible = True
-    for element in leftElements:
+    leftVisibility = 0
+    # reverse the left section so we are working out from the central tree
+    for element in leftElements[::-1]:
+        leftVisibility = leftVisibility + 1
         if element.height >= tree.height:
-            leftVisible = False
             break
 
-    rightVisible = True
+    rightVisibility = 0
     for element in rightElements:
+        rightVisibility = rightVisibility + 1
         if element.height >= tree.height:
-            rightVisible = False
             break
 
-    return (leftVisible, rightVisible)
+    return (leftVisibility, rightVisibility)
 
 # rotates the grid left 90 degrees
 def pivotGrid(treeArray):
@@ -64,14 +68,14 @@ def main():
         for idx, tree in enumerate(row):
             tree.upVisibility, tree.downVisibility = checkRowVisibility(tree, idx, row)
 
-    visibleTreeCount = 0
+    highestVisibilityScore = 0
 
     for treeRow in treeArray:
         for tree in treeRow:
-            if tree.isVisible():
-                visibleTreeCount = visibleTreeCount + 1
+            if(tree.getScore() > highestVisibilityScore):
+                highestVisibilityScore = tree.getScore()
 
-    print("visible tree count => " + str(visibleTreeCount))
+    print("highest visibility score => " + str(highestVisibilityScore))
 
 if __name__ == "__main__":
     main()
