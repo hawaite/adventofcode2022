@@ -1,5 +1,6 @@
 import scala.io.Source
 import scala.util.matching.Regex
+import scala.collection.mutable.{Map => MutableMap}
 
 object Exceptions{
     class CannotCdToFileException extends RuntimeException
@@ -99,15 +100,15 @@ object FileSys{
         }
     }
 
-    def recursivelyFindLargeDirectoriesFromRoot() = {
+    def getDirectorySizesFromRoot():MutableMap[String,Int] = {
         // for each directory in the current directory
         // calculate that directory size and sum it with the other directories
-        var directorySizes:collection.mutable.Map[String,Int] = collection.mutable.Map()
+        var directorySizes:MutableMap[String,Int] = MutableMap()
         calculateDirectorySize(this.root, directorySizes)
-        println("result => " + directorySizes.filter((directoryTuple) => directoryTuple._2 <= 100000 ).map(_._2).reduce((x1, x2) => x1 + x2) )
+        return directorySizes
     }
 
-    def calculateDirectorySize(directory:DirectoryFsItem, directorySizes:collection.mutable.Map[String,Int]):Int = {
+    def calculateDirectorySize(directory:DirectoryFsItem, directorySizes:MutableMap[String,Int]):Int = {
 
         // sum all files in current directory
         var currentDirectoryItemsSizes = directory
@@ -149,6 +150,17 @@ object Main{
             .getLines()
             .foreach(FileSys.parseInputLine)
 
-        FileSys.recursivelyFindLargeDirectoriesFromRoot()
+        var directorySizes = FileSys.getDirectorySizesFromRoot()
+
+        println("part 1 result => " + directorySizes.filter((directoryTuple) => directoryTuple._2 <= 100000 ).map(_._2).reduce((x1, x2) => x1 + x2) )
+
+        
+        val diskSize = 70000000
+        val requiredFreeSpace = 30000000
+        val usedSpace = directorySizes.get("").get;
+        val currentFreeSpace = diskSize - usedSpace
+        val additionalDiskSpaceRequired = requiredFreeSpace - currentFreeSpace
+        
+        println("part 2 result => " + directorySizes.filter((dir) => {dir._2 >= additionalDiskSpaceRequired}).map((dir) => dir._2).min)
     }
 }
