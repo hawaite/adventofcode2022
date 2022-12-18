@@ -3,6 +3,12 @@
 #include <vector>
 #include "sim.hpp"
 
+char calculatePixel(int pixelLocation, int spriteCenter){
+    if(((spriteCenter -1) <= pixelLocation) && ((spriteCenter + 1) >= pixelLocation))
+        return '#';
+    return '.';
+}
+
 int main(int argc, char** argv){
     Sim sim;
 
@@ -17,18 +23,29 @@ int main(int argc, char** argv){
 
     int currentTick = 1;
     int signalStrength = 0;
-
+    int spriteCentre = sim.getX();
+    int pixelToDraw = ((currentTick -1) % 40);
     while(sim.hasRemainingCommands()){
-        // need to calculate signal strength DURING a tick, meaning before it has any effect.
+        // before
         if(currentTick == 20 || currentTick == 60 || currentTick == 100 || currentTick == 140 || currentTick == 180 || currentTick == 220){
             signalStrength += (currentTick * sim.getX());
         }
-        
+
+        // during
+        //update sprite center
+        spriteCentre = sim.getX();
+        pixelToDraw = ((currentTick -1) % 40);
+
+        std::cout << calculatePixel(pixelToDraw, spriteCentre);
+        if(pixelToDraw == 39)
+            std::cout << std::endl;
+
+        // after
         sim.tick();
 
         currentTick++;
     }
 
-    std::cout << "signal strength value: " << signalStrength << std::endl;
+    std::cout << std::endl << "signal strength value: " << signalStrength << std::endl;
     return 0;
 }
