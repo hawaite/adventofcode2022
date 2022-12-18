@@ -1,3 +1,4 @@
+from functools import reduce
 import math
 
 class Monkey:
@@ -10,10 +11,11 @@ class Monkey:
         self.trueAction = trueAction
         self.falseAction = falseAction
 
-    def throwAllItems(self, monkeyMap, worryDivByThree=True):
+    def throwAllItems(self, monkeyMap, productOfDivisors, worryDivByThree=True):
         for item in self.itemList:
             self.inspectionCount = self.inspectionCount + 1
             old = int(item)
+            old = old % productOfDivisors
             # perform "operation" on item to get its new value
             new = eval(self.operation)
             if worryDivByThree:
@@ -61,26 +63,28 @@ def parseMonkeyLines(monkeyString):
 
     return Monkey(name, startingItems, operation, test, trueTestAction, falseTestAction)
 
-def performRound(monkeys, partTwo):
+def performRound(monkeys, productOfDivisors, partTwo):
     for i in range(0,len(monkeys)):
-        monkeys[str(i)].throwAllItems(monkeys, not partTwo)
+        monkeys[str(i)].throwAllItems(monkeys, productOfDivisors, not partTwo)
 
 def main():
     monkeys = {}
-    partTwo = False
+    partTwo = True
 
     # with open("../input.txt", "r") as fp:
-    with open("../more_test_input/input_short.txt", "r") as fp:
+    with open("../input.txt", "r") as fp:
         allLines = fp.read()
         monkeyInput = allLines.split("\n\n");
         for monkeyLines in monkeyInput:
             monkey = parseMonkeyLines(monkeyLines)
             monkeys[monkey.name] = monkey
 
-    rounds = 20
+    productOfDivisors = reduce((lambda x, y: x * y), [int(x.test) for x in monkeys.values()])
+
+    rounds = 10000
     for i in range(0, rounds):
         # perform single round
-        performRound(monkeys, partTwo)
+        performRound(monkeys, productOfDivisors, partTwo)
 
     inspectionCounts = [x.inspectionCount for x in monkeys.values()]
     inspectionCounts.sort()
