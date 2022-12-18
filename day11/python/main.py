@@ -10,14 +10,15 @@ class Monkey:
         self.trueAction = trueAction
         self.falseAction = falseAction
 
-    def throwAllItems(self, monkeyMap):
+    def throwAllItems(self, monkeyMap, worryDivByThree=True):
         for item in self.itemList:
             self.inspectionCount = self.inspectionCount + 1
             old = int(item)
             # perform "operation" on item to get its new value
             new = eval(self.operation)
-            # divide new value by 3 and take floor of that
-            new = math.floor((new / 3))
+            if worryDivByThree:
+                # divide new value by 3 and take floor of that
+                new = math.floor((new / 3))
             # take new value, mod it with "test"
             testResult = (new % int(self.test)) == 0
             # if zero, throw to true, otherwise throw to false
@@ -60,14 +61,16 @@ def parseMonkeyLines(monkeyString):
 
     return Monkey(name, startingItems, operation, test, trueTestAction, falseTestAction)
 
-def performRound(monkeys):
+def performRound(monkeys, partTwo):
     for i in range(0,len(monkeys)):
-        monkeys[str(i)].throwAllItems(monkeys)
+        monkeys[str(i)].throwAllItems(monkeys, not partTwo)
 
 def main():
     monkeys = {}
+    partTwo = False
 
-    with open("../input.txt", "r") as fp:
+    # with open("../input.txt", "r") as fp:
+    with open("../more_test_input/input_short.txt", "r") as fp:
         allLines = fp.read()
         monkeyInput = allLines.split("\n\n");
         for monkeyLines in monkeyInput:
@@ -75,9 +78,9 @@ def main():
             monkeys[monkey.name] = monkey
 
     rounds = 20
-    for _ in range(0, rounds):
+    for i in range(0, rounds):
         # perform single round
-        performRound(monkeys)
+        performRound(monkeys, partTwo)
 
     inspectionCounts = [x.inspectionCount for x in monkeys.values()]
     inspectionCounts.sort()
