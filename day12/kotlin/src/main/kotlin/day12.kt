@@ -1,21 +1,24 @@
-
-
-import java.util.PriorityQueue
 import java.io.File
 
-val eHeight = 25
+// used for testing on a limites alphabet range
+val endNodeHeight = 25
 
-fun charToHeight(heightChar:Char):Int {
-    if(heightChar == 'S')
-        return 0
-    else if(heightChar == 'E')
-        return eHeight
-    else
-        return heightChar.code - 97
-}
+fun charToHeight(heightChar:Char):Int = if (heightChar == 'S') 0 else if (heightChar == 'E') endNodeHeight else heightChar.code - 97
 
 fun nodeLabelFromCoord(x:Int, y:Int):String = "(" + x + "," + y + ")"
 
+// valid if difference is 1 to -inf
+fun acceptableHeightDifference(current:Node, adjacent:Node) = ((adjacent.height - current.height) <= 1)
+
+fun processAdjacentNode(current:Node, adjacent:Node?){
+    if (adjacent != null && ! adjacent.visited && acceptableHeightDifference(current, adjacent)){
+        // this is a valid node to calculate
+        if((current.shortestDistanceFromStartNode + 1) < adjacent.shortestDistanceFromStartNode){
+            adjacent.shortestDistanceFromStartNode = current.shortestDistanceFromStartNode + 1
+            adjacent.previous = current.label
+        }
+    }
+}
 
 class Node(x:Int, y:Int, height:Int ) {
     val x: Int = x
@@ -29,18 +32,19 @@ class Node(x:Int, y:Int, height:Int ) {
 
 fun main(args: Array<String>){
     val fileLines = File(args[0]).readLines()
-    
 
-    // sort priority queue by distance
-    val compareByDistance: Comparator<Node> = compareBy { it.shortestDistanceFromStartNode }
+    val compareByDistanceFromStartNode: Comparator<Node> = compareBy { it.shortestDistanceFromStartNode }
 
     val unvisited = ArrayList<Node>()
     val nodeMap = HashMap<String,Node>()
+
     var startingNodeLabel:String = "";
     var endingNodeLabel:String = "";
 
     var row = 0
     var col = 0
+
+    // read in characters to create nodes
     for ( line in fileLines ){
         col = 0
         for ( character in line){
@@ -66,93 +70,28 @@ fun main(args: Array<String>){
     println("starting node: " + startingNodeLabel)
     println("  ending node: " + endingNodeLabel)
 
-    // read file in to a big pile of nodes with names based on 2d coords
-    // add all those nodes to the unvisited list
+    // Perform Dijkstra to get shortest path to E node
     while( ! unvisited.isEmpty() ){
-        unvisited.sortWith(compareByDistance)
+        unvisited.sortWith(compareByDistanceFromStartNode)
         var currentNode = unvisited.removeAt(0)
+
         // process neighbours
-        // println("testing node: " + currentNode.label)
-        //test up
-        if(currentNode.y != 0){
-            // can test up
-            var upNode = nodeMap.get(nodeLabelFromCoord(currentNode.x, currentNode.y - 1))
-            // test not in visited list
-            // valid if difference is 1 to -inf
-            if (upNode != null && ! upNode.visited && ((upNode.height - currentNode.height) <= 1)){
-                // this is a valid node to calculate
-                // println("found valid up move to " + upNode.label)
-                if((currentNode.shortestDistanceFromStartNode + 1) < upNode.shortestDistanceFromStartNode){
-                    // println("this move is the new shortest path")
-                    upNode.shortestDistanceFromStartNode = currentNode.shortestDistanceFromStartNode + 1
-                    upNode.previous = currentNode.label
-                }
-            }
-        }
-        //test down
-        if(currentNode.y != (rowMax - 1)){
-            // can test down
-            var downNode = nodeMap.get(nodeLabelFromCoord(currentNode.x, currentNode.y + 1))
-            // test not in visited list
-            // valid if difference is 1 to -inf
-            if (downNode != null && ! downNode.visited && ((downNode.height - currentNode.height) <= 1)){
-                // this is a valid node to calculate
-                // println("found valid down move to " + downNode.label)
-                if((currentNode.shortestDistanceFromStartNode + 1) < downNode.shortestDistanceFromStartNode){
-                    // println("this move is the new shortest path")
-                    downNode.shortestDistanceFromStartNode = currentNode.shortestDistanceFromStartNode + 1
-                    downNode.previous = currentNode.label
-                }
-            }
-        }
-        //test left
-        if(currentNode.x != 0){
-            // can test left
-            var leftNode = nodeMap.get(nodeLabelFromCoord(currentNode.x - 1, currentNode.y))
-            // test not in visited list
-            // valid if difference is 1 to -inf
-            if (leftNode != null && ! leftNode.visited && ((leftNode.height - currentNode.height) <= 1)){
-                // this is a valid node to calculate
-                // println("found valid left move to " + leftNode.label)
-                if((currentNode.shortestDistanceFromStartNode + 1) < leftNode.shortestDistanceFromStartNode){
-                    // println("this move is the new shortest path")
-                    leftNode.shortestDistanceFromStartNode = currentNode.shortestDistanceFromStartNode + 1
-                    leftNode.previous = currentNode.label
-                }
-            }
-        }
-        //test right
-        if(currentNode.x != (colMax - 1)){
-            // can test right
-            var rightNode = nodeMap.get(nodeLabelFromCoord(currentNode.x + 1, currentNode.y))
-            // test not in visited list
-            // valid if difference is 1 to -inf
-            if (rightNode != null && ! rightNode.visited && ((rightNode.height - currentNode.height) <= 1)){
-                // this is a valid node to calculate
-                // println("found valid right move to " + rightNode.label)
-                if((currentNode.shortestDistanceFromStartNode + 1) < rightNode.shortestDistanceFromStartNode){
-                    // println("this move is the new shortest path")
-                    rightNode.shortestDistanceFromStartNode = currentNode.shortestDistanceFromStartNode + 1
-                    rightNode.previous = currentNode.label
-                }
-            }
-        }
+        if(currentNode.y != 0) // can test up
+            processAdjacentNode(currentNode, nodeMap.get(nodeLabelFromCoord(currentNode.x, currentNode.y - 1)))
+        if(currentNode.y != (rowMax - 1)) // can test down
+            processAdjacentNode(currentNode, nodeMap.get(nodeLabelFromCoord(currentNode.x, currentNode.y + 1)))
+        if(currentNode.x != 0) // can test left
+            processAdjacentNode(currentNode, nodeMap.get(nodeLabelFromCoord(currentNode.x - 1, currentNode.y)))
+        if(currentNode.x != (colMax - 1)) // can test right
+            processAdjacentNode(currentNode, nodeMap.get(nodeLabelFromCoord(currentNode.x + 1, currentNode.y)))
+
         // add to visited list
         currentNode.visited = true
         if(currentNode.label == endingNodeLabel){
-            println("visited end node")
             break
         }
     }
 
     var currentTraceNode = nodeMap.get(endingNodeLabel)
-    println("ending distance = " + currentTraceNode?.shortestDistanceFromStartNode) //520
-
-    var path = ""
-    while( currentTraceNode != null){
-        path = currentTraceNode.label + " -> " + path
-        currentTraceNode = nodeMap.get(currentTraceNode.previous)
-    }
-
-    println(path)
+    println("ending distance = " + currentTraceNode?.shortestDistanceFromStartNode)
 }
