@@ -35,9 +35,6 @@
                     <mainClass>Day12Kt</mainClass>
                     <arguments>
                         <argument>${project.basedir}/../input.txt</argument>
-                        <!-- <argument>${project.basedir}/../more_test_input/input_tiny.txt</argument> -->
-                        <!-- <argument>${project.basedir}/../more_test_input/input_impossible.txt</argument> -->
-                        <!-- <argument>${project.basedir}/../more_test_input/input_impossible_large.txt</argument> -->
                     </arguments>
                 </configuration>
             </plugin>

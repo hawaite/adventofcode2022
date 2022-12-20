@@ -67,12 +67,13 @@ class Graph{
         this.colMax = col
     }
 
-    fun resetGraph(){
+    fun resetGraphMeasurements(){
         // reset node values and the unvisited list
         this.unvisited.clear()
         for(node in nodeMap.values){
             node.shortestDistanceFromStartNode = Int.MAX_VALUE
             node.visited = false
+            node.previous = null
             this.unvisited.add(node)
         }
     }
@@ -88,6 +89,7 @@ class Graph{
             this.unvisited.sortWith(compareByDistanceFromStartNode)
             var currentNode = this.unvisited.removeAt(0)
 
+            // println("processing node: " + currentNode.label)
             if(currentNode.shortestDistanceFromStartNode == Int.MAX_VALUE){
                 // there were no more valid nodes. bail.
                 return null
@@ -114,6 +116,7 @@ class Graph{
         var traceList = ArrayList<String>()
 
         while(traceNode != null){
+            // println("tracing node: " + traceNode.label)
             traceList.add(traceNode.label)
             traceNode = this.nodeMap.get(traceNode.previous)
         }
@@ -125,11 +128,9 @@ class Graph{
 fun main(args: Array<String>){
     val fileLines = File(args[0]).readLines()
 
+    // part 1
     var graph = Graph()
     graph.parseFromLines(fileLines)
-
-    println("starting node: " + graph.startingNodeLabel)
-    println("  ending node: " + graph.endingNodeLabel)
 
     val pathResult = graph.calculateShortestPath()
 
@@ -139,4 +140,22 @@ fun main(args: Array<String>){
     else{
         println("ending distance from lst = " + (pathResult.size - 1))
     }
+
+    // part 2
+    println("=== part 2 ===")
+    var shortestPath = Int.MAX_VALUE
+    val levelANodeLabels = graph.nodeMap.values.filter { it.height == 0 }.map { it.label };
+    for ( startingPoint in levelANodeLabels ){
+        graph.resetGraphMeasurements()
+        graph.setStartNode(startingPoint)
+
+        var result = graph.calculateShortestPath()
+        if(result != null){
+            var pathLength = (result.size - 1)
+            if(pathLength < shortestPath)
+                shortestPath = pathLength
+        }
+    }
+
+    println("shortest path from any 'a' node = " + shortestPath)
 }
