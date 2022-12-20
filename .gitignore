@@ -1,6 +1,7 @@
 bin/
 obj/
 node_modules/
+target/
 .vscode/
 .metals/
 *-lock.yaml

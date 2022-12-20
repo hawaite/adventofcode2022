@@ -1,0 +1,51 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>uk.co.hawaite</groupId>
+    <artifactId>day12</artifactId>
+    <version>0.0.1</version>
+
+    <properties>
+        <kotlin.version>1.7.21</kotlin.version>
+        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
+        <main.class>Day12Kt</main.class>
+    </properties>
+
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>Day12Kt</mainClass>
+                    <arguments>
+                        <argument>${project.basedir}/../input.txt</argument>
+                        <!-- <argument>${project.basedir}/../more_test_input/input_short.txt</argument> -->
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+    </dependencies>
+</project>
