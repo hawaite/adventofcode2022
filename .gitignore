@@ -6,3 +6,4 @@ target/
 .metals/
 *-lock.yaml
 more_test_input/
+input_*.txt
