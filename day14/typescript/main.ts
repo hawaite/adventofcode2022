@@ -157,7 +157,7 @@ const partTwo = (startingCollisionSet: Set<string>, floorPlaneY: number) => {
 const getLargestYCoord = (startingCollisionSet: Set<string>): number => {
     let largestY = 0;
     startingCollisionSet.forEach((it) => {
-        var testCoord = new Coordinate(it);
+        let testCoord = new Coordinate(it);
         if (testCoord.y > largestY) largestY = testCoord.y;
     });
 
