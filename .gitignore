@@ -4,6 +4,7 @@ node_modules/
 target/
 .vscode/
 .metals/
-*-lock.yaml
 more_test_input/
+temp/
+*-lock.yaml
 input_*.txt
