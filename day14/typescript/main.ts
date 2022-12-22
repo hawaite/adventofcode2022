@@ -14,12 +14,39 @@ class Coordinate {
     getDownCoord = () => this.x + "," + (this.y + 1);
     getDownLeftCoord = () => this.x - 1 + "," + (this.y + 1);
     getDownRightCoord = () => this.x + 1 + "," + (this.y + 1);
-    canMoveDown = (collisionSet: Set<string>): boolean =>
-        !collisionSet.has(this.getDownCoord());
-    canMoveDownLeft = (collisionSet: Set<string>): boolean =>
-        !collisionSet.has(this.getDownLeftCoord());
-    canMoveDownRight = (collisionSet: Set<string>): boolean =>
-        !collisionSet.has(this.getDownRightCoord());
+    canMoveDown = (
+        collisionSet: Set<string>,
+        floorPlaneY?: number
+    ): boolean => {
+        if (floorPlaneY !== undefined)
+            return (
+                !collisionSet.has(this.getDownCoord()) &&
+                this.y + 1 != floorPlaneY
+            );
+        else return !collisionSet.has(this.getDownCoord());
+    };
+    canMoveDownLeft = (
+        collisionSet: Set<string>,
+        floorPlaneY?: number
+    ): boolean => {
+        if (floorPlaneY !== undefined)
+            return (
+                !collisionSet.has(this.getDownLeftCoord()) &&
+                this.y + 1 != floorPlaneY
+            );
+        else return !collisionSet.has(this.getDownLeftCoord());
+    };
+    canMoveDownRight = (
+        collisionSet: Set<string>,
+        floorPlaneY?: number
+    ): boolean => {
+        if (floorPlaneY !== undefined)
+            return (
+                !collisionSet.has(this.getDownRightCoord()) &&
+                this.y + 1 != floorPlaneY
+            );
+        else return !collisionSet.has(this.getDownRightCoord());
+    };
     moveDown = () => {
         this.y++;
     };
@@ -67,15 +94,8 @@ const generateCollisionSet = (lineList: string[]): Set<string> => {
     return collisionSet;
 };
 
-const main = () => {
-    const lineList: string[] = fs
-        .readFileSync("../input.txt", "ascii")
-        .split("\n");
-
-    const collisionSet = generateCollisionSet(lineList);
-    // TODO: set the to something slightly lower than the lowest coord in collision set
-    const voidPlaneY = 1000;
-
+const partOne = (startingCollisionSet: Set<string>, voidPlaneY: number) => {
+    const collisionSet = startingCollisionSet;
     let sandCount = 0;
     let sandVoided = false;
 
@@ -104,6 +124,56 @@ const main = () => {
     }
 
     console.log("sand count before voiding: " + sandCount);
+};
+
+const partTwo = (startingCollisionSet: Set<string>, floorPlaneY: number) => {
+    const collisionSet = startingCollisionSet;
+    let sandCount = 0;
+
+    while (!collisionSet.has("500,0")) {
+        const currentSand = new Coordinate("500,0");
+        let isStuck = false;
+
+        while (!isStuck) {
+            if (currentSand.canMoveDown(collisionSet, floorPlaneY)) {
+                currentSand.moveDown();
+            } else if (currentSand.canMoveDownLeft(collisionSet, floorPlaneY)) {
+                currentSand.moveDownLeft();
+            } else if (currentSand.canMoveDownRight(collisionSet, floorPlaneY)) {
+                currentSand.moveDownRight();
+            } else {
+                // down did exist in collision set
+                isStuck = true;
+                sandCount++; // only count a sand if it came to rest
+            }
+        }
+
+        collisionSet.add(currentSand.toString());
+    }
+
+    console.log("sand count before hitting 500,0 : " + sandCount);
+};
+
+const getLargestYCoord = (startingCollisionSet: Set<string>): number => {
+    let largestY = 0;
+    startingCollisionSet.forEach((it) => {
+        var testCoord = new Coordinate(it);
+        if (testCoord.y > largestY) largestY = testCoord.y;
+    });
+
+    return largestY;
+};
+
+const main = () => {
+    const lineList: string[] = fs
+        .readFileSync("../input.txt", "ascii")
+        .split("\n");
+
+    const collisionSetPartOne = generateCollisionSet(lineList);
+    const collisionSetPartTwo = new Set<string>(collisionSetPartOne);
+
+    partOne(collisionSetPartOne, getLargestYCoord(collisionSetPartOne) + 2);
+    partTwo(collisionSetPartTwo, getLargestYCoord(collisionSetPartTwo) + 2);
 };
 
 main();
